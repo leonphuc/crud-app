@@ -1,19 +1,29 @@
 import { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
+import ReactPaginate from "react-paginate";
 import axios from "axios";
 import { fectchAllUser } from "../services/UserService";
 function Tables() {
   const [listUsers, setListUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  // const pageCount = Math.ceil(items.length / itemsPerPage);
 
   useEffect(() => {
-    getUser();
+    getUser(1);
   }, []);
 
-  const getUser = async () => {
-    let res = await fectchAllUser();
+  const getUser = async (page) => {
+    let res = await fectchAllUser(page);
     if (res && res.data) {
-      setListUsers(res.data);
+      setListUsers(res);
+      setTotalUsers(res.total);
+      setTotalPages(res.total_pages);
     }
+  };
+
+  const handlePageClick = (e) => {
+    getUser(+e.selected + 1);
   };
 
   return (
@@ -28,9 +38,9 @@ function Tables() {
           </tr>
         </thead>
         <tbody>
-          {listUsers &&
-            listUsers.length > 0 &&
-            listUsers.map((item, index) => (
+          {listUsers.data &&
+            listUsers.data.length > 0 &&
+            listUsers.data.map((item, index) => (
               <tr key={`users-${index}`}>
                 <td>{item.id}</td>
                 <td>{item.email}</td>
@@ -40,6 +50,24 @@ function Tables() {
             ))}
         </tbody>
       </Table>
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="next >"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={5}
+        pageCount={totalPages}
+        previousLabel="< previous"
+        pageClassName="page-item"
+        pageLinkClassName="page-link"
+        previousClassName="page-item"
+        previousLinkClassName="page-link"
+        nextClassName="page-item"
+        nextLinkClassName="page-link"
+        breakClassName="page-item"
+        breakLinkClassName="page-link"
+        containerClassName="pagination"
+        activeClassName="active"
+      />
     </>
   );
 }
