@@ -3,23 +3,36 @@ import Table from "react-bootstrap/Table";
 import ReactPaginate from "react-paginate";
 import { fectchAllUser } from "../services/UserService";
 import ModalAddNew from "./ModalAddNew";
+import ModalEditUser from "./ModalEditUser";
+import ModalConfirm from "./ModalConfirm";
+import _ from "lodash";
 
 function Tables(props) {
+  const [dataUserEdit, setDataUserEdit] = useState({});
+  const [dataUserDelete, setDataUserDelete] = useState({});
+
   const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
+  const [isShowModalEditNew, setIsShowModalEditNew] = useState(false);
+  const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+
   const [listUsers, setListUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
+    setIsShowModalEditNew(false);
+    setIsShowModalDelete(false);
   };
   const handleUpdateTable = (user) => {
-    listUsers.data.unshift(user);
+    // listUsers.data.unshift(user);
+    setListUsers([user, ...listUsers]);
   };
 
-  console.log("listUsers", listUsers);
-
-  // thêm đối tượng mới vào đầu mảng data
+  const handleEditUser = (user) => {
+    setDataUserEdit(user);
+    setIsShowModalEditNew(true);
+  };
 
   useEffect(() => {
     getUser(1);
@@ -28,7 +41,7 @@ function Tables(props) {
   const getUser = async (page) => {
     let res = await fectchAllUser(page);
     if (res && res.data) {
-      setListUsers(res);
+      setListUsers(res.data);
       setTotalUsers(res.total);
       setTotalPages(res.total_pages);
     }
@@ -36,6 +49,24 @@ function Tables(props) {
 
   const handlePageClick = (e) => {
     getUser(+e.selected + 1);
+  };
+
+  const handleEditUserFromModal = (user) => {
+    let cloneListUsers = _.cloneDeep(listUsers);
+    let index = listUsers.findIndex((item) => item.id === user.id);
+    cloneListUsers[index].first_name = user.first_name;
+    setListUsers(cloneListUsers);
+  };
+
+  const handleDeleteUser = (user) => {
+    setIsShowModalDelete(true);
+    setDataUserDelete(user);
+  };
+
+  const handleDeleteUserFromModal = (user) => {
+    let cloneListUsers = _.cloneDeep(listUsers);
+    cloneListUsers = cloneListUsers.filter((item) => item.id !== user.id);
+    setListUsers(cloneListUsers);
   };
 
   return (
@@ -56,17 +87,34 @@ function Tables(props) {
             <th>Email</th>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {listUsers.data &&
-            listUsers.data.length > 0 &&
-            listUsers.data.map((item, index) => (
+          {listUsers &&
+            listUsers.length > 0 &&
+            listUsers.map((item, index) => (
               <tr key={`users-${index}`}>
                 <td>{item.id}</td>
                 <td>{item.email}</td>
                 <td>{item.first_name}</td>
                 <td>{item.last_name}</td>
+                <td>
+                  <button
+                    className="btn btn-warning mx-3"
+                    onClick={() => {
+                      handleEditUser(item);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteUser(item)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
         </tbody>
@@ -93,6 +141,18 @@ function Tables(props) {
         show={isShowModalAddNew}
         handleClose={handleClose}
         handleUpdateTable={handleUpdateTable}
+      />
+      <ModalEditUser
+        show={isShowModalEditNew}
+        handleClose={handleClose}
+        dataUserEdit={dataUserEdit}
+        handleEditUserFromModal={handleEditUserFromModal}
+      />
+      <ModalConfirm
+        show={isShowModalDelete}
+        handleClose={handleClose}
+        dataUserDelete={dataUserDelete}
+        handleDeleteUserFromModal={handleDeleteUserFromModal}
       />
     </>
   );
