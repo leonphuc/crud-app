@@ -2,7 +2,6 @@ import "./App.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import { ToastContainer } from "react-toastify";
-
 import Header from "./components/Header";
 import Tables from "./components/Tables";
 
