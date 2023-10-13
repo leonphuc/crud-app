@@ -1,13 +1,25 @@
 import { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import ReactPaginate from "react-paginate";
-import axios from "axios";
 import { fectchAllUser } from "../services/UserService";
-function Tables() {
+import ModalAddNew from "./ModalAddNew";
+
+function Tables(props) {
+  const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
   const [listUsers, setListUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  // const pageCount = Math.ceil(items.length / itemsPerPage);
+
+  const handleClose = () => {
+    setIsShowModalAddNew(false);
+  };
+  const handleUpdateTable = (user) => {
+    listUsers.data.unshift(user);
+  };
+
+  console.log("listUsers", listUsers);
+
+  // thêm đối tượng mới vào đầu mảng data
 
   useEffect(() => {
     getUser(1);
@@ -28,6 +40,15 @@ function Tables() {
 
   return (
     <>
+      <div className="my-3 add-new">
+        <strong>List Users: </strong>
+        <button
+          className="btn btn-success"
+          onClick={() => setIsShowModalAddNew(true)}
+        >
+          Add new user
+        </button>
+      </div>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -67,6 +88,11 @@ function Tables() {
         breakLinkClassName="page-link"
         containerClassName="pagination"
         activeClassName="active"
+      />
+      <ModalAddNew
+        show={isShowModalAddNew}
+        handleClose={handleClose}
+        handleUpdateTable={handleUpdateTable}
       />
     </>
   );
