@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Tables from "./components/Tables";
+import TodoList from "./components/TodoList";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
 
         <Container>
           <Tables />
+          <TodoList />
         </Container>
       </div>
       <ToastContainer
