@@ -10,7 +10,7 @@ function App() {
   return (
     <>
       <div className="app-container">
-        <Header />
+        {/* <Header /> */}
 
         <Container>
           <Tables />
